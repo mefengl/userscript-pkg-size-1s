@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pkg-size-1s
 // @namespace    https://github.com/mefengl
-// @version      0.1.9
+// @version      0.1.10
 // @description  Adds button to NPM package pages direct to pkg-size.dev for npm package size check. It now also works on Github repositories.
 // @author       mefengl
 // @match        https://www.npmjs.com/package/*
@@ -31,10 +31,16 @@
   }
 
   function createButtonNPM(packageName) {
-    const parent = document.querySelector(".w-third-l");
-    const newElement = parent?.lastElementChild?.cloneNode(true);
-    if (newElement) {
-      createButton(newElement, `https://pkg-size.dev/${packageName}`, "", { backgroundColor: '#FFF5DE', color: '#FF7251', borderColor: '#FF7251' }, `${svgIcon} <strong>Check</strong> Package Size`);
+    let parent = document.querySelector(".w-third-l");
+    if (parent) {
+      let newElement = parent.lastElementChild?.cloneNode(true);
+      let anchor = newElement?.querySelector("a");
+      if (anchor) {
+        Object.assign(anchor.style, { backgroundColor: '#FFF5DE', color: '#FF7251', borderColor: '#FF7251' });
+        anchor.href = `https://pkg-size.dev/${packageName}`;
+        anchor.innerHTML = `${svgIcon} <strong>Check</strong> Package Size`;
+        parent.appendChild(newElement);
+      }
     }
   }
 
