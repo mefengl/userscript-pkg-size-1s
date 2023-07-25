@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pkg-size-1s
 // @namespace    https://github.com/mefengl
-// @version      0.2.1
+// @version      0.2.2
 // @description  Adds button to NPM package pages direct to pkg-size.dev for npm package size check. It now also works on Github repositories.
 // @author       mefengl
 // @match        https://www.npmjs.com/package/*
@@ -14,6 +14,16 @@
   'use strict';
 
   const svgIcon = `<svg viewBox="0 0 24 24" width="1em" height="1em" class="inline"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14M16.5 9.4L7.55 4.24"></path><path d="M3.29 7L12 12l8.71-5M12 22V12"></path><circle cx="18.5" cy="15.5" r="2.5"></circle><path d="M20.27 17.27L22 19"></path></g></svg>`;
+
+  const debounce = (func, delay) => {
+    let debounceTimer;
+    return function () {
+      const context = this;
+      const args = arguments;
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => func.apply(context, args), delay);
+    }
+  }
 
   const createButton = (parent, href, className, styles, innerHTML) => {
     const anchor = document.createElement('a');
@@ -65,13 +75,13 @@
     }
   }
 
-  const onUrlChange = () => {
+  const onUrlChange = debounce(() => {
     const { host, pathname } = window.location;
     const packageName = pathname.split('/')[2];
 
     if (host === 'www.npmjs.com') createButtonNPM(packageName);
     if (host === 'github.com') handleGithub(pathname);
-  }
+  }, 200);
 
   ['pushState', 'replaceState'].forEach(eventType => {
     history[eventType] = ((original) => function () {
