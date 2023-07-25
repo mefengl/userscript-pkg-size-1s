@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pkg-size-1s
 // @namespace    https://github.com/mefengl
-// @version      0.2.2
+// @version      0.2.3
 // @description  Adds button to NPM package pages direct to pkg-size.dev for npm package size check. It now also works on Github repositories.
 // @author       mefengl
 // @match        https://www.npmjs.com/package/*
@@ -23,6 +23,16 @@
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => func.apply(context, args), delay);
     }
+  }
+
+  const detectTheme = () => {
+    const systemTheme = window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const colorMode = document.documentElement.getAttribute('data-color-mode');
+    return colorMode === 'auto'
+      ? systemTheme === 'dark'
+        ? document.documentElement.getAttribute('data-dark-theme')
+        : document.documentElement.getAttribute('data-light-theme')
+      : colorMode;
   }
 
   const createButton = (parent, href, className, styles, innerHTML) => {
@@ -69,7 +79,11 @@
 
       const buttonContainer = content.appendChild(document.createElement('div'));
       buttonContainer.className = 'f6 mt-3';
-      packages.forEach(packageName => createButton(buttonContainer, `https://pkg-size.dev/${packageName}`, "topic-tag topic-tag-link", { backgroundColor: '#FFF5DE', color: '#FF7251' }, packageName));
+      packages.forEach(packageName => createButton(buttonContainer, `https://pkg-size.dev/${packageName}`, "topic-tag topic-tag-link", {
+        backgroundColor:
+          detectTheme() === 'dark' ? '#FFF5DE19' : '#FFF5DE',
+        color: '#FF7251'
+      }, packageName));
 
       packageSection.parentNode.insertBefore(newSection, packageSection.nextSibling);
     }
