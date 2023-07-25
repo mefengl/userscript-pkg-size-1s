@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pkg-size-1s
 // @namespace    https://github.com/mefengl
-// @version      0.2.3
+// @version      0.3.1
 // @description  Adds button to NPM package pages direct to pkg-size.dev for npm package size check. It now also works on Github repositories.
 // @author       mefengl
 // @match        https://www.npmjs.com/package/*
@@ -35,15 +35,6 @@
       : colorMode;
   }
 
-  const createButton = (parent, href, className, styles, innerHTML) => {
-    const anchor = document.createElement('a');
-    Object.assign(anchor.style, styles);
-    anchor.href = href;
-    anchor.className = className;
-    anchor.innerHTML = innerHTML;
-    parent.appendChild(anchor);
-  }
-
   const createButtonNPM = packageName => {
     const parent = document.querySelector(".w-third-l");
     const newElement = parent?.lastElementChild.cloneNode(true);
@@ -55,6 +46,17 @@
       anchor.innerHTML = `${svgIcon} <strong>Check</strong> Package Size`;
       parent?.appendChild(newElement);
     }
+  }
+
+  const createButton = ({ parent, href, className, styles, innerHTML, hoverStyles }) => {
+    const anchor = document.createElement('a');
+    anchor.href = href;
+    anchor.className = className;
+    anchor.innerHTML = innerHTML;
+    Object.assign(anchor.style, styles);
+    anchor.addEventListener('mouseover', () => Object.assign(anchor.style, hoverStyles));
+    anchor.addEventListener('mouseout', () => Object.assign(anchor.style, styles));
+    parent.appendChild(anchor);
   }
 
   const handleGithub = pathname => {
@@ -79,11 +81,23 @@
 
       const buttonContainer = content.appendChild(document.createElement('div'));
       buttonContainer.className = 'f6 mt-3';
-      packages.forEach(packageName => createButton(buttonContainer, `https://pkg-size.dev/${packageName}`, "topic-tag topic-tag-link", {
-        backgroundColor:
-          detectTheme() === 'dark' ? '#FFF5DE19' : '#FFF5DE',
-        color: '#FF7251'
-      }, packageName));
+      const theme = detectTheme();
+      packages.forEach(packageName => createButton({
+        parent: buttonContainer,
+        href: `https://pkg-size.dev/${packageName}`,
+        className: "topic-tag topic-tag-link",
+        styles: {
+          backgroundColor:
+            theme === 'dark' ? '#FFF5DE19' : '#FFF5DE',
+          color: '#FF7251'
+        },
+        innerHTML: packageName,
+        hoverStyles: {
+          backgroundColor:
+            theme === 'dark' ? '#FF7C5C' : '#FF7251',
+          color: '#FFF6F1'
+        }
+      }));
 
       packageSection.parentNode.insertBefore(newSection, packageSection.nextSibling);
     }
