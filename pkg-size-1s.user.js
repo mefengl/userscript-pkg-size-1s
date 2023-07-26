@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         pkg-size-1s
 // @namespace    https://github.com/mefengl
-// @version      0.3.2
+// @version      0.3.3
 // @description  Adds button to NPM package pages direct to pkg-size.dev for npm package size check. It now also works on Github repositories.
 // @author       mefengl
 // @match        https://www.npmjs.com/package/*
@@ -64,7 +64,13 @@
 
     const readmeFile = document.querySelector("#readme .markdown-body");
     const installCommands = [...readmeFile?.querySelectorAll('pre, code')].map(element => element.innerText.match(/(npm i|npm install|yarn add|pnpm add)(( -[^ ]+)* ([a-z0-9\-]+))+/gi)).filter(Boolean) || [];
-    const packages = installCommands.flat().flatMap(command => command.split(' ').filter(word => !word.startsWith('-') && !['npm', 'i', 'install', 'yarn', 'add', 'pnpm'].includes(word)));
+    const packages = [...new Set(
+      installCommands
+        .flat()
+        .flatMap(command => command.split(' ')
+          .filter(word => !word.startsWith('-') && !['npm', 'i', 'install', 'yarn', 'add', 'pnpm'].includes(word))
+        )
+    )];
 
     const packageSection = [...document.querySelectorAll(".BorderGrid-row")].find(row => row.querySelector('h2')?.innerText.includes('Packages'));
     if (packageSection && packages.length) {
