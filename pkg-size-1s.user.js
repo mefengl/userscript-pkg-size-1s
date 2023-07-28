@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         pkg-size-1s
 // @namespace    https://github.com/mefengl
-// @version      0.4.1
+// @version      0.4.2
 // @description  Adds button to NPM package pages direct to pkg-size.dev for npm package size check. It now also works on Github repositories.
 // @author       mefengl
 // @match        https://www.npmjs.com/package/*
 // @match        https://github.com/*/*
 // @grant        none
 // @license      MIT
+// @updateURL    https://github.com/mefengl/userscript-pkg-size-1s/raw/main/pkg-size-1s.user.js
 // ==/UserScript==
 
 (() => {
